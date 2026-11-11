@@ -1,0 +1,82 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7367abff-bb73-4a52-8c69-d81b1c17c5c9",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"valor_compra\": 60,\n  \"distancia_km\": 4.5 ,\n  \"cliente_premium\" : \"sim\"\n  \n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "1e98e8bb-5d88-4c4f-a3ed-2f05544b5b2b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "# Acessa o primeiro item da lista de entrada\ndados = _items[0][\"json\"]\n\nvalor = float(dados.get(\"valor_compra\", 0))\ndistancia = float(dados.get(\"distancia_km\", 0))\npremium = dados.get(\"cliente_premium\", \"nao\").lower() == \"sim\"\n\nif distancia <= 3:\n    frete = 5.00\nelif distancia <= 8:\n    frete = 10.00\nelse:\n    frete = 20.00\n\ndesconto = 0.00\nif premium and valor > 50.00:\n    desconto = valor * 0.10\n\nif valor >= 100.00:\n    frete = 0.00\n\ntotal_final = valor + frete - desconto\n\nreturn [{\n    \"json\": {\n        \"valor_original\": valor,\n        \"custo_frete\": frete,\n        \"desconto_aplicado\": desconto,\n        \"total_a_pagar\": round(total_final, 2)\n    }\n}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "53914c53-242a-441c-bbd0-c04a369daa81",
+      "name": "Code in Python"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in Python",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c374a8e2-4497-473a-a66b-a8a713f50304",
+  "meta": {
+    "instanceId": "c7fc9172fe87d26a0eec7aa8c67f806a1c3a104bbd6e314db7a24620aaa84042"
+  },
+  "nodeGroups": [],
+  "id": "fXpJUBn0s1rEUEaS",
+  "tags": []
+}
